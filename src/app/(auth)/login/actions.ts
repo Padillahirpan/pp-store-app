@@ -28,7 +28,10 @@ export async function login(
   if (!validatedFields.success) {
     return {
       status: "error",
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: {
+        ...validatedFields.error.flatten().fieldErrors,
+        _form: ["Invalid form submission."],
+      },
     };
   }
 
@@ -64,7 +67,7 @@ export async function login(
   if (!profile) {
     return {
       status: "error",
-      error: {
+      errors: {
         ...prevState.errors,
         _form: ["Profile not found."],
       },
