@@ -1,5 +1,6 @@
 "use client";
 
+import FormInput from "@/src/components/commons/form-input";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -8,29 +9,50 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
+import { Form } from "@/src/components/ui/form";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/src/components/ui/form";
-import { Input } from "@/src/components/ui/input";
-import { INITIAL_LOGIN_FORM } from "@/src/constants/auth-constant";
-import { LoginForm, loginSchema } from "@/src/validations/auth-validation";
+  INITIAL_LOGIN_FORM,
+  INITIAL_STATE_LOGIN_FORM,
+} from "@/src/constants/auth-constant";
+import { LoginForm, loginSchemaForm } from "@/src/validations/auth-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { login } from "../actions";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchemaForm),
     defaultValues: INITIAL_LOGIN_FORM,
   });
 
+  const [loginState, loginAction, isPendingLogin] = useActionState(
+    login,
+    INITIAL_STATE_LOGIN_FORM
+  );
+
   const onSubmit = form.handleSubmit(async (data) => {
-    console.log("this is test login");
+    console.log(`this is test login: ${JSON.stringify(data)}`);
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      console.log(`key: ${key}, value: ${value}`);
+      formData.append(key, value);
+    });
+
+    startTransition(() => {
+      console.log("Submitting login form...");
+      loginAction(formData);
+    });
   });
+
+  useEffect(() => {
+    if (loginState.status === "error") {
+      startTransition(() => {
+        loginAction(null);
+      });
+    }
+  }, [loginState]);
 
   return (
     <Card>
@@ -41,44 +63,22 @@ export default function Login() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4">
-            <FormField
-              control={form.control}
+            <FormInput
+              form={form}
               name="email"
-              render={({ field: { ...rest } }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...rest}
-                      type="email"
-                      placeholder="Insert your email"
-                      autoComplete="off"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs"></FormMessage>
-                </FormItem>
-              )}
+              label="Email"
+              placeholder="Insert your email"
+              type="email"
             />
-            <FormField
-              control={form.control}
+            <FormInput
+              form={form}
               name="password"
-              render={({ field: { ...rest } }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...rest}
-                      type="password"
-                      placeholder="**********"
-                      autoComplete="off"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs"></FormMessage>
-                </FormItem>
-              )}
+              label="Password"
+              placeholder="**********"
+              type="password"
             />
             <Button type="submit" className="w-full mt-4">
-              Continue
+              {isPendingLogin ? <Loader2 className="animate-spin" /> : "Login"}
             </Button>
           </form>
         </Form>
