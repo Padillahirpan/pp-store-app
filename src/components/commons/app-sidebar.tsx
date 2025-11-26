@@ -30,6 +30,7 @@ import {
 } from "@/src/constants/sidebar-contant";
 import { usePathname } from "next/navigation";
 import { cn } from "@/src/lib/utils";
+import { signOut } from "@/src/actions/auth-action";
 
 export default function AppSidebar() {
   const { isMobile } = useSidebar();
@@ -125,7 +126,11 @@ export default function AppSidebar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      signOut();
+                    }}
+                  >
                     <LogOut />
                     Logout
                   </DropdownMenuItem>

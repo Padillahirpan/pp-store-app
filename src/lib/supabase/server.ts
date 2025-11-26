@@ -26,7 +26,6 @@ export async function createClient({
               cookieStore.set(name, value, options);
             });
           } catch (error) {
-            // noop
             console.log(
               "Failed to set cookies in server-side Supabase client:",
               error

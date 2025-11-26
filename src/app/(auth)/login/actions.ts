@@ -12,13 +12,9 @@ export async function login(
   prevState: AuthFormState,
   formData: FormData | null
 ) {
-  console.log(`FIRST INITIAL STATE: ${JSON.stringify(prevState)}`);
-
   if (!formData) {
     return INITIAL_STATE_LOGIN_FORM;
   }
-
-  console.log(`Supabase FORM DATA: ${JSON.stringify(formData)}`);
 
   const validatedFields = loginSchemaForm.safeParse({
     email: formData.get("email"),
@@ -40,13 +36,10 @@ export async function login(
   const {
     error,
     data: { user },
-    // } = await supabase.auth.signInWithPassword(validatedFields.data);
   } = await supabase.auth.signInWithPassword({
     email: validatedFields.data.email,
     password: validatedFields.data.password,
   });
-
-  console.log(`Supabase login error: ${JSON.stringify(error)}`);
 
   if (error) {
     return {
@@ -64,23 +57,15 @@ export async function login(
     .eq("id", user?.id)
     .single();
 
-  if (!profile) {
-    return {
-      status: "error",
-      errors: {
-        ...prevState.errors,
-        _form: ["Profile not found."],
-      },
-    };
+  if (profile) {
+    const cookieStore = await cookies();
+    cookieStore.set("user_profile", JSON.stringify(profile), {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
   }
-
-  const cookieStore = await cookies();
-  cookieStore.set("profile", JSON.stringify(profile), {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7,
-  });
 
   revalidatePath("/", "layout");
   redirect("/");

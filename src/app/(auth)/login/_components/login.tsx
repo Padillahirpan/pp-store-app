@@ -37,12 +37,10 @@ export default function Login() {
     console.log(`this is test login: ${JSON.stringify(data)}`);
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-      console.log(`key: ${key}, value: ${value}`);
       formData.append(key, value);
     });
 
     startTransition(() => {
-      console.log("Submitting login form...");
       loginAction(formData);
     });
   });
