@@ -98,8 +98,8 @@ export default function UserManagementPage() {
         totalPages={totalPages}
         currentPage={currentPage}
         currentLimit={currentLimit}
-        onPageChange={handleChangePage}
-        onLimitChange={handleChangeLimit}
+        onChangePage={handleChangePage}
+        onChangeLimit={handleChangeLimit}
       />
     </div>
   );

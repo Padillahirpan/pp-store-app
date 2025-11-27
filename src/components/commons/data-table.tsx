@@ -9,6 +9,17 @@ import {
   TableRow,
 } from "../ui/table";
 import PaginationDataTable from "./pagination-data-table";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { LIMIT_LISTS } from "@/src/constants/datatable-contant";
 
 export default function DataTable({
   header,
@@ -17,8 +28,8 @@ export default function DataTable({
   totalPages,
   currentPage,
   currentLimit,
-  onPageChange,
-  onLimitChange,
+  onChangePage,
+  onChangeLimit,
 }: {
   header: string[];
   data?: (string | ReactNode)[][];
@@ -26,8 +37,8 @@ export default function DataTable({
   totalPages: number;
   currentPage: number;
   currentLimit: number;
-  onPageChange: (page: number) => void;
-  onLimitChange: (limit: number) => void;
+  onChangePage: (page: number) => void;
+  onChangeLimit: (limit: number) => void;
 }) {
   return (
     <div className="w-full flex flex-col gap-4">
@@ -73,12 +84,34 @@ export default function DataTable({
         </Table>
       </Card>
       <div className="flex items-center justify-between">
-        <div></div>
+        <div className="flex items-center gap-2">
+          <Label>Limit</Label>
+          <Select
+            value={currentLimit.toString()}
+            onValueChange={(value) => {
+              onChangeLimit(parseInt(value));
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Limit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Limit</SelectLabel>
+                {LIMIT_LISTS.map((limit) => (
+                  <SelectItem key={limit} value={limit.toString()}>
+                    {limit}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex justify-end">
           <PaginationDataTable
             totalPages={totalPages}
             currentPage={currentPage}
-            onChangePage={onPageChange}
+            onChangePage={onChangePage}
           />
         </div>
       </div>
