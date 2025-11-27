@@ -15,16 +15,23 @@ import { toast } from "sonner";
 
 export default function UserManagementPage() {
   const supabase = createClient();
-  const { currentPage, currentLimit, handleChangePage, handleChangeLimit } =
-    useDatatable();
+  const {
+    currentPage,
+    currentLimit,
+    currentSearch,
+    handleChangePage,
+    handleChangeLimit,
+    handleChangeSearch,
+  } = useDatatable();
   const { data: users, isLoading } = useQuery({
-    queryKey: ["users", currentPage, currentLimit],
+    queryKey: ["users", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const result = await supabase
         .from("profiles")
         .select("*", { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .order("created_at");
+        .order("created_at")
+        .ilike("name", `%${currentSearch}%`);
 
       if (result.error)
         toast.error("Get User data failed", {
@@ -83,7 +90,12 @@ export default function UserManagementPage() {
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
         <h1 className="text-2xl font-bold">User Management</h1>
         <div className="flex gap-2">
-          <Input placeholder="Search by name" />
+          <Input
+            placeholder="Search by name"
+            onChange={(e) => {
+              handleChangeSearch(e.target.value);
+            }}
+          />
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
