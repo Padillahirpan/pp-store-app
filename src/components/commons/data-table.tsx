@@ -59,7 +59,7 @@ export default function DataTable({
                 {row.map((cell, cellIndex) => (
                   <TableCell
                     key={`td-${rowIndex}-${cellIndex}`}
-                    className="px-6 py-4"
+                    className="px-6 py-4 capitalize"
                   >
                     {cell}
                   </TableCell>

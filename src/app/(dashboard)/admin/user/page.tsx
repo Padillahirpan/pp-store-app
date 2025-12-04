@@ -10,9 +10,11 @@ import useDatatable from "@/src/hooks/use-data-table";
 import { createClient } from "@/src/lib/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import DialogCreateUser from "./_components/dialog-create-user";
+import { Profile } from "@/src/types/auth";
+import DialogUpdateUser from "./_components/dialog-update-user";
 
 export default function UserManagementPage() {
   const supabase = createClient();
@@ -24,6 +26,18 @@ export default function UserManagementPage() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDatatable();
+
+  const [selectedAction, setSelectedAction] = useState<{
+    data: Profile;
+    type: "update" | "delete";
+  } | null>(null);
+
+  const handleChangeAction = (open: boolean) => {
+    if (!open) {
+      setSelectedAction(null);
+    }
+  };
+
   const {
     data: users,
     isLoading,
@@ -64,7 +78,7 @@ export default function UserManagementPage() {
                 </span>
               ),
               action: () => {
-                toast.info("Edit user is not implemented yet");
+                setSelectedAction({ data: user, type: "update" });
               },
             },
             {
@@ -118,6 +132,12 @@ export default function UserManagementPage() {
         currentLimit={currentLimit}
         onChangePage={handleChangePage}
         onChangeLimit={handleChangeLimit}
+      />
+      <DialogUpdateUser
+        open={selectedAction !== null && selectedAction.type === "update"}
+        handleChangeAction={handleChangeAction}
+        currentData={selectedAction?.data}
+        refetch={refetch}
       />
     </div>
   );

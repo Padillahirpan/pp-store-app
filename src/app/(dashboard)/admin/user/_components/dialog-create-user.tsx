@@ -52,10 +52,6 @@ export default function DialogCreateUser({ refetch }: { refetch: () => void }) {
     });
   });
 
-  function resetPreview() {
-    setPreview(undefined);
-  }
-
   useEffect(() => {
     if (createUserState.status === "error") {
       toast.error("Create user failed", {
@@ -67,10 +63,14 @@ export default function DialogCreateUser({ refetch }: { refetch: () => void }) {
       toast.success("Create user success", {
         description: "Create user success",
       });
-      form.reset();
-      // resetPreview();
+
       document.querySelector<HTMLButtonElement>('[data-state="open"]')?.click();
       refetch();
+
+      setTimeout(() => {
+        form.reset();
+        setPreview(undefined);
+      }, 10);
     }
   }, [createUserState]);
 
