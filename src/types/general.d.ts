@@ -4,3 +4,8 @@ export type formState = {
     _form?: string[];
   };
 };
+
+export type PreviewImage = {
+  file: File;
+  displayUrl: string;
+};
